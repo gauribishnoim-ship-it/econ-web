@@ -596,8 +596,8 @@ ALL_KEYS.forEach(key=>{
   slot.className = 'potion-slot reveal';
   slot.dataset.target = key;
   slot.dataset.color = d.color;
-  slot.innerHTML = `${potionSVG(d.color, d.colorDeep)}
-    <div class="p-label">${d.name}</div>`;
+  const svg = key === 'index' ? indexPotionSVG() : potionSVG(d.color, d.colorDeep);
+  slot.innerHTML = `${svg}<div class="p-label">${d.name}</div>`;
   shelf.appendChild(slot);
   obs.observe(slot);
 });
