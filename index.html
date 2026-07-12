@@ -539,7 +539,6 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 const shelf = document.getElementById('shelf');
 const ALL_KEYS = [...Object.keys(SECTIONS), 'index'];
 const ALL_DATA = {...SECTIONS, index: INDEX_DATA};
-
 function unitNote(value){
   if(value.includes('°C')) return 'Degrees Celsius (°C): the standard metric unit for temperature change.';
   if(value.includes('L Cr')) return 'L Cr = Lakh Crore = 100,000 crore, roughly ₹1 trillion.';
@@ -552,11 +551,10 @@ function unitNote(value){
   if(value.includes('%')) return 'Percent (%): a share out of 100, used for growth, change, or proportion of a total.';
   return '';
 }
-
 function potionSVG(color, colorDeep){
   const id = color.replace('#','');
   return `
-  <svg class="potion-svg" viewBox="0 0 84 118">
+  <svg class="potion-svg" viewBox="0 0 84 118" overflow="visible">
     <defs>
       <linearGradient id="liq-${id}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="${colorDeep}"/>
@@ -589,7 +587,39 @@ function potionSVG(color, colorDeep){
           fill="none" stroke="#2a2118" stroke-width="2.4"/>
   </svg>`;
 }
-
+function indexPotionSVG(){
+  const stripeColors = ['#EC5E96','#4CC471','#2E9DF7','#E0791F','#FFCB3D'];
+  const stripeH = 10;
+  const startY = 60;
+  let stripes = '';
+  stripeColors.forEach((c,i)=>{
+    stripes += `<rect class="liquid" x="8" y="${startY + i*stripeH}" width="68" height="${stripeH}" fill="${c}" opacity=".88"/>`;
+  });
+  const allBubbles = stripeColors.map((c,i)=>`
+    <circle class="bubble" cx="${22+i*10}" cy="${startY+8+i*9}" r="${1.8+i*0.3}" fill="#fff" opacity=".55" style="animation-delay:${i*0.4}s"/>`).join('');
+  const escapes = stripeColors.map((c,i)=>`
+    <circle class="escape-bubble" cx="${36+i*3}" cy="${30-i*3}" r="${2+i*0.2}" fill="${c}" opacity="0" style="animation-delay:${i*0.22}s"/>`).join('');
+  return `
+  <svg class="potion-svg" viewBox="0 0 84 118" overflow="visible">
+    <defs>
+      <clipPath id="clip-index">
+        <path d="M34 14 L34 38 L14 78 Q10 90 22 100 L62 100 Q74 90 70 78 L50 38 L50 14 Z"/>
+      </clipPath>
+    </defs>
+    <rect class="cork" x="36" y="2" width="12" height="14" rx="2" fill="#7a6a4f"/>
+    <rect class="cork" x="32" y="0" width="20" height="6" rx="2" fill="#5b4d38"/>
+    <path d="M34 14 L34 38 L14 78 Q10 90 22 100 L62 100 Q74 90 70 78 L50 38 L50 14 Z"
+          fill="rgba(255,255,255,0.14)" stroke="#2a2118" stroke-width="2.4"/>
+    <g clip-path="url(#clip-index)">
+      ${stripes}
+      <rect class="shimmer" x="-20" y="${startY}" width="14" height="50" fill="rgba(255,255,255,.4)" transform="skewX(-18)"/>
+      ${allBubbles}
+    </g>
+    ${escapes}
+    <path d="M34 14 L34 38 L14 78 Q10 90 22 100 L62 100 Q74 90 70 78 L50 38 L50 14 Z"
+          fill="none" stroke="#2a2118" stroke-width="2.4"/>
+  </svg>`;
+}
 ALL_KEYS.forEach(key=>{
   const d = ALL_DATA[key];
   const slot = document.createElement('div');
@@ -601,7 +631,6 @@ ALL_KEYS.forEach(key=>{
   shelf.appendChild(slot);
   obs.observe(slot);
 });
-
 /* ===================== POUR TRANSITION ===================== */
 const pourOverlay = document.getElementById('pourOverlay');
 function pourTo(key, x, y, color){
